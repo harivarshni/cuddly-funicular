@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Biology Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8ff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .quiz-container {
+      width: 90%;
+      max-width: 700px;
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 12px;
+      margin: 30px auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    h1 {
+      text-align: center;
+      color: #2a7;
+    }
+    .question {
+      margin: 15px 0;
+      font-weight: bold;
+    }
+    .options {
+      margin-bottom: 20px;
+    }
+    .options label {
+      display: block;
+      margin: 6px 0;
+      cursor: pointer;
+    }
+    button {
+      display: block;
+      margin: 15px auto;
+      padding: 10px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #2a7;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #248a5f;
+    }
+    .result {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Biology Quiz</h1>
+    <form id="quizForm"></form>
+    <button type="button" onclick="submitQuiz()">Submit Quiz</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const questions = [
+      { q: "1. What is the basic unit of life?", a: "Cell", options: ["Tissue", "Organ", "Cell", "Molecule"] },
+      { q: "2. What gas do plants release during photosynthesis?", a: "Oxygen", options: ["Carbon dioxide", "Oxygen", "Nitrogen", "Hydrogen"] },
+      { q: "3. Which blood cells help fight infections?", a: "White blood cells", options: ["Red blood cells", "White blood cells", "Platelets", "Plasma"] },
+      { q: "4. What is the powerhouse of the cell?", a: "Mitochondria", options: ["Nucleus", "Ribosome", "Mitochondria", "Chloroplast"] },
+      { q: "5. Which organ purifies blood in the human body?", a: "Kidney", options: ["Heart", "Kidney", "Liver", "Lungs"] },
+      { q: "6. What pigment makes plants green?", a: "Chlorophyll", options: ["Hemoglobin", "Chlorophyll", "Carotene", "Melanin"] },
+      { q: "7. Which blood group is the universal donor?", a: "O negative", options: ["O positive", "O negative", "AB positive", "A negative"] },
+      { q: "8. What is the human body's largest organ?", a: "Skin", options: ["Heart", "Brain", "Liver", "Skin"] },
+      { q: "9. Which vitamin is produced when skin is exposed to sunlight?", a: "Vitamin D", options: ["Vitamin A", "Vitamin C", "Vitamin D", "Vitamin B12"] },
+      { q: "10. Which is the longest bone in the human body?", a: "Femur", options: ["Tibia", "Femur", "Fibula", "Humerus"] },
+      { q: "11. Which blood cells carry oxygen?", a: "Red blood cells", options: ["White blood cells", "Red blood cells", "Platelets", "Plasma"] },
+      { q: "12. Which organ controls thoughts and memory?", a: "Brain", options: ["Lungs", "Brain", "Heart", "Kidney"] },
+      { q: "13. What type of blood circulation system do humans have?", a: "Double circulation", options: ["Single circulation", "Double circulation", "Open circulation", "No circulation"] },
+      { q: "14. Which part of the plant absorbs water?", a: "Roots", options: ["Leaves", "Stem", "Flowers", "Roots"] },
+      { q: "15. Which gas do humans exhale?", a: "Carbon dioxide", options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"] },
+      { q: "16. Which organ stores bile?", a: "Gall bladder", options: ["Kidney", "Gall bladder", "Liver", "Pancreas"] },
+      { q: "17. How many chambers does the human heart have?", a: "4", options: ["2", "3", "4", "5"] },
+      { q: "18. What is the normal body temperature in Celsius?", a: "37", options: ["36", "37", "38", "39"] },
+      { q: "19. Which organ is responsible for filtering toxins?", a: "Liver", options: ["Heart", "Kidney", "Lungs", "Liver"] },
+      { q: "20. Which element is essential for hemoglobin?", a: "Iron", options: ["Calcium", "Iron", "Potassium", "Magnesium"] },
+      { q: "21. Which blood group is universal recipient?", a: "AB positive", options: ["O positive", "O negative", "AB positive", "A positive"] },
+      { q: "22. What is the main function of the ribcage?", a: "Protect lungs and heart", options: ["Help digestion", "Store energy", "Protect lungs and heart", "Circulate blood"] },
+      { q: "23. Which organ helps in digestion by producing enzymes?", a: "Pancreas", options: ["Liver", "Kidney", "Pancreas", "Stomach"] },
+      { q: "24. Which part of the eye controls the amount of light?", a: "Iris", options: ["Cornea", "Lens", "Retina", "Iris"] },
+      { q: "25. Which is the largest artery in the human body?", a: "Aorta", options: ["Vein", "Capillary", "Aorta", "Pulmonary vein"] }
+    ];
+
+    const quizForm = document.getElementById('quizForm');
+
+    function loadQuiz() {
+      questions.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.classList.add('question-block');
+        div.innerHTML = `
+          <div class="question">${item.q}</div>
+          <div class="options">
+            ${item.options.map(opt => `
+              <label>
+                <input type="radio" name="q${index}" value="${opt}"> ${opt}
+              </label>
+            `).join('')}
+          </div>
+        `;
+        quizForm.appendChild(div);
+      });
+    }
+
+    function submitQuiz() {
+      let score = 0;
+      questions.forEach((item, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected && selected.value === item.a) {
+          score++;
+        }
+      });
+      document.getElementById('result').innerText = `You scored ${score} out of ${questions.length}`;
+    }
+
+    loadQuiz();
+  </script>
+</body>
+</html>
